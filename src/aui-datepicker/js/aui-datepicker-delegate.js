@@ -16,6 +16,7 @@ var Lang = A.Lang,
     CONTAINER = 'container',
     DATE_SEPARATOR = 'dateSeparator',
     DATEPICKER_SELECTION = 'datepickerSelection',
+    EVENT_ENTER_KEY = 'enterKey',
     FOCUS = 'focus',
     MASK = 'mask',
     MOUSEDOWN = 'mousedown',
@@ -23,6 +24,12 @@ var Lang = A.Lang,
     TRIGGER = 'trigger',
     VALUE_EXTRACTOR = 'valueExtractor',
     VALUE_FORMATTER = 'valueFormatter';
+
+/**
+ * Fired when then enter key is pressed on an input node.
+ *
+ * @event enterKey
+ */
 
 /**
  * A base class for DatePickerDelegate.
@@ -87,6 +94,12 @@ DatePickerDelegate.prototype = {
                 CLICK,
                 A.bind('_onceUserInteractionRelease', instance), trigger)
         ];
+
+        instance.on(
+            'activeInputChange',
+            A.bind('_handleActiveInputChangeEvent', instance));
+
+        console.log('bind');
 
         instance.publish(
             SELECTION_CHANGE, {
@@ -188,7 +201,54 @@ DatePickerDelegate.prototype = {
     },
 
     /**
-     * TODO. Wanna help? Please send a Pull Request.
+    * Handles tab key events
+    *
+    * @method _handleTabKeyEvent
+    * @protected
+    */
+    _handleTabKeyEvent: function() {
+        this.hide();
+    },
+
+    /**
+    * Fires when the 'activeInput' attribute changes.  The keydown listener is
+    * removed from the old active input and is attached to the new one.
+    *
+    * @method _handleActiveInputChangeEvent
+    * @protected
+    */
+    _handleActiveInputChangeEvent: function(event) {
+        var instance = this;
+
+        if (event.prevVal) {
+            event.prevVal.detach(
+                'keydown', instance._handleKeydownEvent, instance);
+        }
+
+        if (event.newVal) {
+            event.newVal.on('keydown', instance._handleKeydownEvent, instance);
+        }
+
+        console.log('_handleActiveInputChangeEvent');
+    },
+
+    /**
+    * Handles keydown events
+    *
+    * @method _handleKeydownEvent
+    * @param event
+    * @protected
+    */
+    _handleKeydownEvent: function(event) {
+        var instance = this;
+
+        if (event.isKey('enter')) {
+            instance.fire(EVENT_ENTER_KEY);
+        }
+    },
+
+    /**
+     * Fires once user interacts.
      *
      * @method _onceUserInteraction
      * @param event
