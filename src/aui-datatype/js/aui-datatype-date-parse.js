@@ -257,8 +257,11 @@ A.mix(DateParser.prototype, {
                     instance, calendar, Lang.trim(value), part);
             }
         }
-
-        return instance._getCalendarDate(calendar, opt_date);
+        if (i < length) {
+            return false;
+        } else {
+            return instance._getCalendarDate(calendar, opt_date);
+        }
     },
 
     /**
